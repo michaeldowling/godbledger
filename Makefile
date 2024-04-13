@@ -1,4 +1,5 @@
 VERSION ?= latest
+PLATFORMS := linux/amd64,linux/arm64
 
 # set default data directory by OS
 ifeq ($(OS),Windows_NT)
@@ -77,7 +78,8 @@ linux-arm-64:
 build-docker: docker-build
 
 docker-build:
-	docker build --platform linux/amd64 -t godbledger:$(VERSION) -t godbledger:latest -f ./utils/Dockerfile.build .
+	# docker build --platform linux/amd64 -t godbledger:$(VERSION) -t godbledger:latest -f ./utils/Dockerfile.build .
+	docker buildx build --push --platform=$(PLATFORMS) -f ./utils/Dockerfile.build -t ghcr.io/michaeldowling/godbledger:$(VERSION) -t ghcr.io/michaeldowling/godbledger:latest .
 
 docker-login:
 	@$(if $(strip $(shell docker ps | grep godbledger-server)), @docker exec -it godbledger-server /bin/ash || 0, @docker run -it --rm --entrypoint /bin/ash godbledger:$(VERSION) )
